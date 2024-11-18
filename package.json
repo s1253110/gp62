@@ -1,0 +1,21 @@
+{
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "*",
+    "express-flash": "^0.0.2",
+    "express-formidable": "^1.2.0",
+    "express-session": "^1.18.1",
+    "fs": "0.0.1-security",
+    "method-override": "^3.0.0",
+    "mongodb": "^4.4.1",
+    "passport": "*",
+    "passport-local": "^1.0.0",
+    "passport-facebook": "*"
+  },
+  "engine": "*",
+  "scripts": {
+    "start": "node server"
+  }
+}

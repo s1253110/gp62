@@ -9,6 +9,7 @@ const passport = require('passport')
 const flash = require('express-flash')
 const session = require('express-session')
 const override = require('method-override')
+const FacebookStrategy = require('passport-facebook').Strategy
 
 const initializePassword = require('./passport.js');
 initializePassword(
@@ -17,9 +18,37 @@ initializePassword(
     id => users.find(user => user.id === id )
 )
 
-
-
 const users = [];
+var user = {};
+passport.serializeUser(function (user, done) {
+    done(null, user);
+});
+passport.deserializeUser(function (id, done) {
+    done(null, user);
+});
+
+var facebookAuth = {
+    'clientID' : '1284767246284093',
+    'clientSecret' : 'ee5a6aa63a30742c37146e4a27dd3187',
+    'callbackURL' : 'http://localhost:8099/auth/facebook/callback'
+}
+
+passport.use(new FacebookStrategy({
+    "clientID"        : facebookAuth.clientID,
+    "clientSecret"    : facebookAuth.clientSecret,
+    "callbackURL"     : facebookAuth.callbackURL
+  },  
+  function (token, refreshToken, profile, done) {
+    console.log("Facebook Profile: " + JSON.stringify(profile));
+    console.log(profile);
+    user = {};
+    user['id'] = profile.id;
+    user['name'] = profile.displayName;
+    user['type'] = profile.provider; 
+    console.log('user object: ' + JSON.stringify(user));
+    return done(null,user); 
+  })
+);
 
 app.use(express.static('public')); 
 app.use(express.urlencoded({extended: false}))
@@ -38,6 +67,13 @@ app.use(passport.session())
 app.get('/', checkNotAuthenticated, (req, res) => {
 	res.render('login.ejs');
 })
+
+app.get("/auth/facebook", passport.authenticate("facebook", { scope : "email" }));
+app.get("/auth/facebook/callback",
+    passport.authenticate("facebook", {
+        successRedirect : "/hello",
+        failureRedirect : "/"
+}));
 
 app.get('/hello', checkAuthenticated, (req, res) => {
 	res.render('hello.ejs', {name: req.user.name});
